@@ -255,7 +255,9 @@ class BugsnagServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        echo("DARIA LOG REGISTER!\n");
         $this->app->singleton('bugsnag', function (Container $app) {
+            echo("DARIA BUGSNAG SINGLETON!\n");
             $config = $app->config->get('bugsnag');
             $client = new Client(new Configuration($config['api_key']), new LaravelResolver($app), $this->getGuzzle($config));
 
@@ -292,6 +294,7 @@ class BugsnagServiceProvider extends ServiceProvider
             }
 
             if ($this->isSessionTrackingAllowed($config)) {
+                echo("DARIA SESSION ALLOWED, setting up session tracking\n");
                 $endpoint = isset($config['session_endpoint']) ? $config['session_endpoint'] : null;
                 $this->setupSessionTracking($client, $endpoint, $this->app->events);
             }
@@ -501,6 +504,7 @@ class BugsnagServiceProvider extends ServiceProvider
      */
     protected function setupSessionTracking(Client $client, $endpoint, $events)
     {
+        echo("DARIA SESSION TRACKING\n");
         $client->setAutoCaptureSessions(true);
         if (!is_null($endpoint)) {
             $client->setSessionEndpoint($endpoint);
@@ -560,9 +564,15 @@ class BugsnagServiceProvider extends ServiceProvider
     {
         // Session support removed in Lumen 5.3 - only setup automatic session
         // tracking if the session function is avaiable
-        return isset($config['auto_capture_sessions'])
-               && $config['auto_capture_sessions']
-               && function_exists('session');
+        echo("DARIA IS SESSION ALLOWED: \n");
+        $isSet = isset($config['auto_capture_sessions']);
+        $autoCapture = $config['auto_capture_sessions'];
+        $funcExist = function_exists('session');
+        
+        echo $isSet ? 'true' : 'false';
+        echo $autoCapture ? 'true' : 'false';
+        echo $funcExist ? 'true' : 'false';
+        return $isSet && $autoCapture && $funcExist;
     }
 
     /**
@@ -572,6 +582,7 @@ class BugsnagServiceProvider extends ServiceProvider
      */
     public function provides()
     {
+        echo("DARIA PROVIDES");
         return ['bugsnag', 'bugsnag.tracker', 'bugsnag.logger', 'bugsnag.multi'];
     }
 }
